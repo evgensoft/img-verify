@@ -3,9 +3,10 @@ package handlers
 import (
 	"context"
 	"image"
-	"img-verify/logger"
 	"net/http"
 	"time"
+
+	"img-verify/logger"
 
 	"github.com/corona10/goimagehash"
 )
@@ -15,6 +16,7 @@ const (
 	NoteImageNotFound = "NOT_FOUND"
 	NoteFaceNotFound  = "NO_FACE"
 	GetImageTimeout   = 60 * time.Second
+	MaxImageBytes     = 50 * 1024 * 1024
 )
 
 var log = logger.GetLogger()
@@ -38,9 +40,10 @@ func ImageInfo(msg *Message) {
 		return
 	}
 
-	img1, _, err := image.Decode(res.Body)
+	img1, _, err := image.Decode(http.MaxBytesReader(nil, res.Body, MaxImageBytes))
 	if err != nil {
 		msg.Error = err.Error()
+		msg.Note = NoteImageNotFound
 
 		return
 	}
