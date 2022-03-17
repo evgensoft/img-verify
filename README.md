@@ -1,0 +1,12 @@
+[![Maintainability](https://api.codeclimate.com/v1/badges/390ad26a6778ff191ac5/maintainability)](https://codeclimate.com/github/evgensoft/img-verify/maintainability)
+[![Test Coverage](https://api.codeclimate.com/v1/badges/390ad26a6778ff191ac5/test_coverage)](https://codeclimate.com/github/evgensoft/img-verify/test_coverage)
+
+Микросервис img-verify предназначен для предварительной проверки изображений загружаемых в соц. сети (большей частью в VK)
+
+Сервис проверяет следующие параметры:
+- [x] Проверка корректности загрузки изображения
+- [x] Проверка размера изображения (длина+ширина не более 14000 пикселей, не более 50 Мб)
+- [x] Проверка по хеш на изображения-заглушки Img-хостингов (Not_found, Img_deleted...)
+- [x] Поиск лица человека на изображении
+- [ ] Подключение сторонних face-detection
+- [ ] Проверка на качество изображения (https://cloud.yandex.ru/docs/vision/concepts)
