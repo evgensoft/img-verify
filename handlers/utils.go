@@ -25,22 +25,30 @@ func ImageInfo(msg *Message) {
 	ctx, cancel := context.WithTimeout(context.Background(), GetImageTimeout)
 	defer cancel()
 
-	res, err := http.NewRequestWithContext(ctx, http.MethodGet, msg.URL, nil)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, msg.URL, nil)
 	if err != nil {
 		msg.Error = err.Error()
 
 		return
 	}
-	defer res.Body.Close()
 
-	if res.Response.StatusCode != http.StatusOK {
-		msg.Error = "Ошибка загрузки файла - HTTP code " + res.Response.Status
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		msg.Error = err.Error()
+
+		return
+	}
+
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		msg.Error = "Ошибка загрузки файла - HTTP code " + resp.Status
 		msg.Note = NoteImageNotFound
 
 		return
 	}
 
-	img1, _, err := image.Decode(http.MaxBytesReader(nil, res.Body, MaxImageBytes))
+	img1, _, err := image.Decode(http.MaxBytesReader(nil, resp.Body, MaxImageBytes))
 	if err != nil {
 		msg.Error = err.Error()
 		msg.Note = NoteImageNotFound
