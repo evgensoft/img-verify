@@ -35,7 +35,7 @@ jobs:
           dockerfile: Dockerfile
           tags: latest
 
-      - name: Deploy package to digitalocean
+      - name: Deploy package to VPS
         uses: appleboy/ssh-action@master
         env:
           GITHUB_USERNAME: ${{ secrets.USERNAME }}
@@ -51,4 +51,4 @@ jobs:
             docker pull ghcr.io/evgensoft/img_verify/img_verify:latest
             docker stop img_verify
             docker system prune -f
-            docker run --restart=always --name img_verify -dit -p 8080:8080 ghcr.io/evgensoft/img_verify/img_verify:latest
+            docker run --restart=always --name img_verify -v /home/ubuntu/img_verify:/app/log -dit -p 8080:8080 ghcr.io/evgensoft/img_verify/img_verify:latest
