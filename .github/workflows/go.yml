@@ -51,4 +51,4 @@ jobs:
             docker pull ghcr.io/evgensoft/img_verify/img_verify:latest
             docker stop img_verify
             docker system prune -f
-            docker run --rm --name img_verify -v /home/ubuntu/img_verify:/app/log -dit -p 8080:8080 ghcr.io/evgensoft/img_verify/img_verify:latest
+            docker run --restart=always --name img_verify -v /home/ubuntu/img_verify:/app/log -dit -p 8080:8080 ghcr.io/evgensoft/img_verify/img_verify:latest
