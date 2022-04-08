@@ -16,7 +16,7 @@ const (
 	NoteImageNotFound = "NOT_FOUND"
 	NoteFaceNotFound  = "NO_FACE"
 	GetImageTimeout   = 60 * time.Second
-	MaxImageBytes     = 50 * 1024 * 1024
+	MaxImageBytes     = 10 * 1024 * 1024
 )
 
 var log = logger.GetLogger()
