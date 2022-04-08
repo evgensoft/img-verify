@@ -2,12 +2,14 @@ package main
 
 import (
 	"html"
-	"img-verify/handlers"
-	"img-verify/logger"
 	"net/http"
+	_ "net/http/pprof"
 	"os"
 	"os/signal"
 	"syscall"
+
+	"img-verify/handlers"
+	"img-verify/logger"
 
 	_ "embed"
 	_ "image/gif"

@@ -1,8 +1,10 @@
 package handlers
 
 import (
+	"bytes"
 	"context"
 	"image"
+	"io"
 	"net/http"
 	"time"
 
@@ -48,7 +50,16 @@ func ImageInfo(msg *Message) {
 		return
 	}
 
-	img1, _, err := image.Decode(http.MaxBytesReader(nil, resp.Body, MaxImageBytes))
+	resp.Body = http.MaxBytesReader(nil, resp.Body, MaxImageBytes)
+	payload, err := io.ReadAll(resp.Body)
+	if err != nil {
+		msg.Error = err.Error()
+		msg.Note = NoteImageNotFound
+
+		return
+	}
+
+	img1, _, err := image.Decode(bytes.NewReader(payload))
 	if err != nil {
 		msg.Error = err.Error()
 		msg.Note = NoteImageNotFound
