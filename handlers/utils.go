@@ -23,7 +23,7 @@ const (
 
 var log = logger.GetLogger()
 
-func ImageInfo(msg *Message) {
+func ImageInfo(msg *Message, onlyHash bool) {
 	ctx, cancel := context.WithTimeout(context.Background(), GetImageTimeout)
 	defer cancel()
 
@@ -51,6 +51,7 @@ func ImageInfo(msg *Message) {
 	}
 
 	resp.Body = http.MaxBytesReader(nil, resp.Body, MaxImageBytes)
+
 	payload, err := io.ReadAll(resp.Body)
 	if err != nil {
 		msg.Error = err.Error()
@@ -90,7 +91,9 @@ func ImageInfo(msg *Message) {
 		return
 	}
 
-	if !findFace(img1) {
-		msg.Note = NoteFaceNotFound
+	if !onlyHash {
+		if !findFace(img1) {
+			msg.Note = NoteFaceNotFound
+		}
 	}
 }

@@ -3,7 +3,7 @@ module img-verify
 go 1.18
 
 require (
-	github.com/corona10/goimagehash v1.0.3
+	github.com/corona10/goimagehash v1.1.0
 	github.com/esimov/pigo v1.4.5
 
 )

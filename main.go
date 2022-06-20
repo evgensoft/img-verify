@@ -1,7 +1,6 @@
 package main
 
 import (
-	"html"
 	"net/http"
 	_ "net/http/pprof"
 	"os"
@@ -29,12 +28,8 @@ func main() {
 		log.Fatalf("Error reading the cascade file: %s", err)
 	}
 
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(http.StatusOK)
-		log.Infof("%v %q", r.Method, html.EscapeString(r.URL.Path))
-	})
-
 	http.HandleFunc("/get_image_info", handlers.GetImageInfo)
+	http.HandleFunc("/get_image_hash", handlers.GetImageHash)
 
 	go func() {
 		log.Fatal(http.ListenAndServe(":8080", nil))
