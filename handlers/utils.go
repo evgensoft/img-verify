@@ -84,7 +84,7 @@ func ImageInfo(msg *Message, onlyHash bool) {
 	}
 
 	msg.Hash = hash1.ToString()
-	// hash default image for "Picture not fond" = "d:40e0c6a6f4008080"
+	// hash default image for "Picture not found" = "d:40e0c6a6f4008080"
 	if hash1.ToString() == "d:40e0c6a6f4008080" {
 		msg.Note = NoteImageNotFound
 

@@ -42,8 +42,6 @@ func findFace(img image.Image) bool {
 
 	var qThresh float32 = 5.0
 
-	findFace := false
-
 	dets := pigo1.RunCascade(cParams, 1)
 	for _, face := range dets {
 		if face.Q > qThresh {
@@ -66,5 +64,5 @@ func findFace(img image.Image) bool {
 		}
 	}
 
-	return findFace
+	return false
 }
