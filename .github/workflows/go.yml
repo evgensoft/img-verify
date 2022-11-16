@@ -36,21 +36,21 @@ jobs:
       - name: Go Dependency Submission
         uses: actions/go-dependency-submission@v1.0.2
 
-      - name: Bump version and push tag
-        id: tag_version
-        uses: miguelfito/github-bump-and-tag-action@v1
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          dry_run: true
+      # - name: Bump version and push tag
+      #   id: tag_version
+      #   uses: miguelfito/github-bump-and-tag-action@v1
+      #   with:
+      #     github_token: ${{ secrets.GITHUB_TOKEN }}
+      #     dry_run: true
 
-      - name: Create a GitHub release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ steps.tag_version.outputs.new_tag }}
-          release_name: Release ${{ steps.tag_version.outputs.new_tag }}
-          body: ${{ steps.tag_version.outputs.changelog }}
+      # - name: Create a GitHub release
+      #   uses: actions/create-release@v1
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #   with:
+      #     tag_name: ${{ steps.tag_version.outputs.new_tag }}
+      #     release_name: Release ${{ steps.tag_version.outputs.new_tag }}
+      #     body: ${{ steps.tag_version.outputs.changelog }}
 
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - name: Build and Publish to Github Packages Registry
