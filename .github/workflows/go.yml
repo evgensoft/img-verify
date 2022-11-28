@@ -66,6 +66,14 @@ jobs:
           environment: |
             DEBUG=True
             FOO=bar
+          # include: |
+          #   ./src
+          #   package.json
+          exclude: |
+            ./git
+            ./github
+            .gitignore
+            README.md
 
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - name: Build and Publish to Github Packages Registry
