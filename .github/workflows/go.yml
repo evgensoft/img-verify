@@ -10,7 +10,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - uses: actions/cache@v3
         with:
@@ -27,8 +27,8 @@ jobs:
           go-version-file: "go.mod"
           cache: true
 
-      - name: Test
-        run: go test -v ./...
+      # - name: Test
+      #   run: go test -v ./...
 
       - name: Build
         run: go build -v ./...
@@ -51,6 +51,21 @@ jobs:
       #     tag_name: ${{ steps.tag_version.outputs.new_tag }}
       #     release_name: Release ${{ steps.tag_version.outputs.new_tag }}
       #     body: ${{ steps.tag_version.outputs.changelog }}
+
+      - name: Deploy Function to Yandex Cloud
+        id: sls-func
+        uses: yc-actions/yc-sls-function@v2
+        with:
+          yc-sa-json-credentials: ${{ secrets.YC_SA_JSON_CREDENTIALS }}
+          folder-id: "b1gdc4jel0cegsk6h65s"
+          function-name: "img-verify"
+          runtime: "golang119"
+          memory: "128Mb"
+          entrypoint: "index.Handler"
+          execution-timeout: 5
+          environment: |
+            DEBUG=True
+            FOO=bar
 
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - name: Build and Publish to Github Packages Registry

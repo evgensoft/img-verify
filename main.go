@@ -22,17 +22,17 @@ var cascadeFile []byte
 var log = logger.GetLogger()
 
 func main() {
-	log.Info("Запуск программы")
+	log.Info().Msg("Запуск программы")
 
 	if err := handlers.CascadeInit(cascadeFile); err != nil {
-		log.Fatalf("Error reading the cascade file: %s", err)
+		log.Fatal().Msgf("Error reading the cascade file: %s", err)
 	}
 
 	http.HandleFunc("/get_image_info", handlers.GetImageInfo)
 	http.HandleFunc("/get_image_hash", handlers.GetImageHash)
 
 	go func() {
-		log.Fatal(http.ListenAndServe(":8080", nil))
+		log.Fatal().Msgf("Error ListenAndServe - %v", http.ListenAndServe(":8080", nil))
 	}()
 
 	sig := make(chan os.Signal, 1)
@@ -40,6 +40,5 @@ func main() {
 
 	s := <-sig
 
-	log.Infof("SIGTERM received - %v - shutting down", s.String())
-	_ = log.Sync()
+	log.Info().Msgf("SIGTERM received - %v - shutting down", s.String())
 }

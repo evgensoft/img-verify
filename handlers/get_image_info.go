@@ -22,13 +22,13 @@ func GetImageInfo(resp http.ResponseWriter, req *http.Request) {
 
 	err := json.NewDecoder(req.Body).Decode(&reqMessage)
 	if err != nil {
-		log.Errorf("error decode json: %v", err)
+		log.Error().Msgf("error decode json: %v", err)
 		http.Error(resp, err.Error(), http.StatusBadRequest)
 
 		return
 	}
 
-	log.Infof("Req %s %s - %+#v", req.Method, req.RequestURI, reqMessage)
+	log.Info().Msgf("Req %s %s - %+#v", req.Method, req.RequestURI, reqMessage)
 
 	if reqMessage.URL == "" {
 		http.Error(resp, "URL is null", http.StatusBadRequest)
@@ -40,7 +40,7 @@ func GetImageInfo(resp http.ResponseWriter, req *http.Request) {
 
 	body, err := json.Marshal(&reqMessage)
 	if err != nil {
-		log.Errorf("error json.Marshal: %v", err)
+		log.Error().Msgf("error json.Marshal: %v", err)
 		resp.WriteHeader(http.StatusInternalServerError)
 
 		return
@@ -49,11 +49,11 @@ func GetImageInfo(resp http.ResponseWriter, req *http.Request) {
 	resp.WriteHeader(http.StatusOK)
 	resp.Header().Set("Content-Type", "application/json")
 
-	log.Infof("Ans %s", string(body))
+	log.Info().Msgf("Ans %s", string(body))
 
 	_, err = resp.Write(body)
 	if err != nil {
-		log.Errorf("error write answer - %v", err)
+		log.Error().Msgf("error write answer - %v", err)
 	}
 
 	debug.FreeOSMemory()
@@ -68,13 +68,13 @@ func GetImageHash(resp http.ResponseWriter, req *http.Request) {
 
 	err := json.NewDecoder(req.Body).Decode(&reqMessage)
 	if err != nil {
-		log.Errorf("error decode json: %v", err)
+		log.Error().Msgf("error decode json: %v", err)
 		http.Error(resp, err.Error(), http.StatusBadRequest)
 
 		return
 	}
 
-	log.Infof("Req %s %s - %+#v", req.Method, req.RequestURI, reqMessage)
+	log.Info().Msgf("Req %s %s - %+#v", req.Method, req.RequestURI, reqMessage)
 
 	if reqMessage.URL == "" {
 		http.Error(resp, "URL is null", http.StatusBadRequest)
@@ -86,7 +86,7 @@ func GetImageHash(resp http.ResponseWriter, req *http.Request) {
 
 	body, err := json.Marshal(&reqMessage)
 	if err != nil {
-		log.Errorf("error json.Marshal: %v", err)
+		log.Error().Msgf("error json.Marshal: %v", err)
 		resp.WriteHeader(http.StatusInternalServerError)
 
 		return
@@ -95,11 +95,11 @@ func GetImageHash(resp http.ResponseWriter, req *http.Request) {
 	resp.WriteHeader(http.StatusOK)
 	resp.Header().Set("Content-Type", "application/json")
 
-	log.Infof("Ans %s", string(body))
+	log.Info().Msgf("Ans %s", string(body))
 
 	_, err = resp.Write(body)
 	if err != nil {
-		log.Errorf("error write answer - %v", err)
+		log.Error().Msgf("error write answer - %v", err)
 	}
 
 	debug.FreeOSMemory()
