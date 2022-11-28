@@ -63,7 +63,7 @@ jobs:
           memory: "128Mb"
           entrypoint: "index.Handler"
           execution-timeout: 5
-          service-account: "ajenaijai6uesf8ps8kk"
+          service-account: "ajeih1bmna4po796e9n9"
           environment: |
             YANDEX_CLOUD_SERVERLESS_FUNCTION=true
           # include: |

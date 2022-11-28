@@ -102,7 +102,6 @@ func ImageInfo(msg *Message, onlyHash bool) {
 	}
 
 	if !onlyHash {
-		
 		// Определяем работу в YANDEX_CLOUD
 		yaCloud, exists := os.LookupEnv("YANDEX_CLOUD_SERVERLESS_FUNCTION")
 		if !exists { // если не YANDEX_CLOUD - определяем лица локальной библиотекой
@@ -159,6 +158,7 @@ func ImageYandexModeration(payload *[]byte) error {
 
 	body, err := ApiRequest("POST", "https://vision.api.cloud.yandex.net/vision/v1/batchAnalyze", req)
 	if err != nil {
+		log.Debug().Msgf("err Response from Cloud - %s", string(*body))
 		return err
 	}
 
@@ -220,7 +220,8 @@ func ApiRequest(method, url string, body []byte) (*[]byte, error) {
 	defer response.Body.Close()
 
 	if response.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("unexpected status code from apiRequest: %d", response.StatusCode)
+		resBody, _ := io.ReadAll(response.Body)
+		return nil, fmt.Errorf("unexpected status code from apiRequest: %d - %v", response.StatusCode, string(resBody))
 	}
 
 	response.Body = http.MaxBytesReader(nil, response.Body, MaxImageBytes)
