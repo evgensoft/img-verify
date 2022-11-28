@@ -59,7 +59,7 @@ jobs:
           yc-sa-json-credentials: ${{ secrets.YC_SA_JSON_CREDENTIALS }}
           folder-id: "b1gdc4jel0cegsk6h65s"
           function-name: "img-verify"
-          runtime: "golang119"
+          runtime: "golang116"
           memory: "128Mb"
           entrypoint: "index.Handler"
           execution-timeout: 5
@@ -73,6 +73,7 @@ jobs:
             ./git
             ./github
             .gitignore
+            Dockerfile
             README.md
 
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
