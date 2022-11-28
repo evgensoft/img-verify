@@ -59,7 +59,7 @@ jobs:
           yc-sa-json-credentials: ${{ secrets.YC_SA_JSON_CREDENTIALS }}
           folder-id: "b1gdc4jel0cegsk6h65s"
           function-name: "img-verify"
-          runtime: "golang118"
+          runtime: "golang116"
           memory: "128Mb"
           entrypoint: "index.Handler"
           execution-timeout: 5
