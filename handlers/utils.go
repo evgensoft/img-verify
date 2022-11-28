@@ -120,6 +120,10 @@ func ImageInfo(msg *Message, onlyHash bool) {
 }
 
 func ImageYandexModeration(payload *[]byte) error {
+	if len(*payload) >= 1000000 {
+		// TODO: decrease image size for check in Cloud
+		return nil
+	}
 	/*
 		type ClassificationConfig struct {
 			Model string `json:"model"`
