@@ -59,11 +59,11 @@ jobs:
           yc-sa-json-credentials: ${{ secrets.YC_SA_JSON_CREDENTIALS }}
           folder-id: "b1gdc4jel0cegsk6h65s"
           function-name: "img-verify"
-          runtime: "golang116"
+          runtime: "golang118"
           memory: "128Mb"
           entrypoint: "index.Handler"
           execution-timeout: 5
-          service-account: "service-acc-serverless-functions"
+          service-account: "ajeih1bmna4po796e9n9"
           environment: |
             YANDEX_CLOUD_SERVERLESS_FUNCTION=true
           # include: |

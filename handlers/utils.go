@@ -102,6 +102,7 @@ func ImageInfo(msg *Message, onlyHash bool) {
 	}
 
 	if !onlyHash {
+		
 		// Определяем работу в YANDEX_CLOUD
 		yaCloud, exists := os.LookupEnv("YANDEX_CLOUD_SERVERLESS_FUNCTION")
 		if !exists { // если не YANDEX_CLOUD - определяем лица локальной библиотекой
