@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"context"
 	"encoding/base64"
-	"encoding/json"
 	"fmt"
 	"image"
 	"image/gif"
@@ -114,52 +113,58 @@ func ImageInfo(msg *Message, onlyHash bool) {
 			err := ImageYandexModeration(payload)
 			if err != nil {
 				msg.Error = err.Error()
-				msg.Note = NoteImageNotFound
+				// msg.Note = NoteImageNotFound
 			}
 		}
 	}
 }
 
 func ImageYandexModeration(payload *[]byte) error {
-	type ClassificationConfig struct {
-		Model string `json:"model"`
-	}
+	/*
+		type ClassificationConfig struct {
+			Model string `json:"model"`
+		}
 
-	type Features struct {
-		Type                 string               `json:"type"`
-		ClassificationConfig ClassificationConfig `json:"classificationConfig"`
-	}
+		type Features struct {
+			Type                 string               `json:"type"`
+			ClassificationConfig ClassificationConfig `json:"classificationConfig,omitempty"`
+		}
 
-	type AnalyzeSpecs struct {
-		Content  string     `json:"content"`
-		Features []Features `json:"features"`
-	}
+		type AnalyzeSpecs struct {
+			Content  string     `json:"content"`
+			Features []Features `json:"features"`
+		}
 
-	type ImageYaModeration struct {
-		FolderID     string         `json:"folderId"`
-		AnalyzeSpecs []AnalyzeSpecs `json:"analyze_specs"`
-	}
+		type ImageYaModeration struct {
+			FolderID     string         `json:"folderId"`
+			AnalyzeSpecs []AnalyzeSpecs `json:"analyze_specs"`
+		}
 
-	imgB64 := base64.StdEncoding.EncodeToString(*payload)
-	a := AnalyzeSpecs{}
-	a.Content = imgB64
+		imgB64 := base64.StdEncoding.EncodeToString(*payload)
+		a := AnalyzeSpecs{}
+		a.Content = imgB64
 
-	a.Features = append(a.Features, Features{Type: "Classification", ClassificationConfig: ClassificationConfig{Model: "quality"}})
-	a.Features = append(a.Features, Features{Type: "Classification", ClassificationConfig: ClassificationConfig{Model: "moderation"}})
-	a.Features = append(a.Features, Features{Type: "FACE_DETECTION"})
-	yaMod := ImageYaModeration{}
-	yaMod.FolderID = "b1gdc4jel0cegsk6h65s"
-	yaMod.AnalyzeSpecs = append(yaMod.AnalyzeSpecs, a)
+		a.Features = append(a.Features, Features{Type: "Classification", ClassificationConfig: ClassificationConfig{Model: "quality"}})
+		a.Features = append(a.Features, Features{Type: "Classification", ClassificationConfig: ClassificationConfig{Model: "moderation"}})
+		a.Features = append(a.Features, Features{Type: "FACE_DETECTION"})
+		yaMod := ImageYaModeration{}
+		yaMod.FolderID = "b1gdc4jel0cegsk6h65s"
+		yaMod.AnalyzeSpecs = append(yaMod.AnalyzeSpecs, a)
 
-	req, err := json.Marshal(yaMod)
-	if err != nil {
-		return err
-	}
+		req, err := json.Marshal(yaMod)
+		if err != nil {
+			return err
+		}
+	*/
 
-	log.Debug().Msgf(string(req))
+	reqStr := `{"folderId": "b1gdc4jel0cegsk6h65s", "analyze_specs": [{"content": "##content##","features": [{"type": "Classification","classificationConfig":{"model": "quality"}},{"type": "Classification", "classificationConfig": {"model": "moderation"}},{"type": "FACE_DETECTION"}]}]}`
+	req := []byte(strings.ReplaceAll(reqStr, "##content##", base64.StdEncoding.EncodeToString(*payload)))
 
 	body, err := ApiRequest("POST", "https://vision.api.cloud.yandex.net/vision/v1/batchAnalyze", req)
 	if err != nil {
+		if body != nil {
+			log.Debug().Msgf("Response from Cloud - %s", string(*body))
+		}
 		return err
 	}
 
