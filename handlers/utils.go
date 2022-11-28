@@ -158,7 +158,6 @@ func ImageYandexModeration(payload *[]byte) error {
 
 	body, err := ApiRequest("POST", "https://vision.api.cloud.yandex.net/vision/v1/batchAnalyze", req)
 	if err != nil {
-		log.Debug().Msgf("err Response from Cloud - %s", string(*body))
 		return err
 	}
 
