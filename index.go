@@ -39,9 +39,9 @@ func Handler(ctx context.Context, request []byte) (*Response, error) {
 		return nil, errors.New("URL is null")
 	}
 
-	handlers.ImageInfo(req, true)
+	handlers.ImageInfo(req, false)
 
-	log.Info().Msgf("send - %+#v", req)
+	// log.Info().Msgf("send - %+#v", req)
 	// Тело ответа необходимо вернуть в виде структуры, которая автоматически преобразуется в JSON-документ,
 	// который отобразится на экране
 	return &Response{

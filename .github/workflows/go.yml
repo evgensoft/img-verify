@@ -12,14 +12,14 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - uses: actions/cache@v3
-        with:
-          path: |
-            ~/.cache/go-build
-            ~/go/pkg/mod
-          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
-          restore-keys: |
-            ${{ runner.os }}-go-
+      # - uses: actions/cache@v3
+      #   with:
+      #     path: |
+      #       ~/.cache/go-build
+      #       ~/go/pkg/mod
+      #     key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+      #     restore-keys: |
+      #       ${{ runner.os }}-go-
 
       - name: Set up Go
         uses: actions/setup-go@v3
@@ -76,30 +76,30 @@ jobs:
             README.md
 
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - name: Build and Publish to Github Packages Registry
-        uses: elgohr/Publish-Docker-Github-Action@master
-        with:
-          name: evgensoft/img_verify/img_verify
-          registry: ghcr.io
-          username: ${{ secrets.USERNAME }}
-          password: ${{ secrets. GITHUB_TOKEN }}
-          dockerfile: Dockerfile
-          tags: latest
+      # - name: Build and Publish to Github Packages Registry
+      #   uses: elgohr/Publish-Docker-Github-Action@master
+      #   with:
+      #     name: evgensoft/img_verify/img_verify
+      #     registry: ghcr.io
+      #     username: ${{ secrets.USERNAME }}
+      #     password: ${{ secrets. GITHUB_TOKEN }}
+      #     dockerfile: Dockerfile
+      #     tags: latest
 
-      - name: Deploy package to VPS
-        uses: appleboy/ssh-action@master
-        env:
-          GITHUB_USERNAME: ${{ secrets.USERNAME }}
-          GITHUB_TOKEN: ${{ secrets. GITHUB_TOKEN }}
-        with:
-          host: ${{ secrets.DEPLOY_HOST }}
-          port: ${{ secrets.DEPLOY_PORT }}
-          username: ${{ secrets.DEPLOY_USER }}
-          key: ${{ secrets.DEPLOY_KEY }}
-          envs: GITHUB_USERNAME, GITHUB_TOKEN
-          script: |
-            docker login ghcr.io -u $GITHUB_USERNAME -p $GITHUB_TOKEN
-            docker pull ghcr.io/evgensoft/img_verify/img_verify:latest
-            docker stop img_verify
-            docker system prune -f
-            docker run --restart=always --name img_verify -v /home/ubuntu/img_verify:/app/log -dit -p 8080:8080 ghcr.io/evgensoft/img_verify/img_verify:latest
+      # - name: Deploy package to VPS
+      #   uses: appleboy/ssh-action@master
+      #   env:
+      #     GITHUB_USERNAME: ${{ secrets.USERNAME }}
+      #     GITHUB_TOKEN: ${{ secrets. GITHUB_TOKEN }}
+      #   with:
+      #     host: ${{ secrets.DEPLOY_HOST }}
+      #     port: ${{ secrets.DEPLOY_PORT }}
+      #     username: ${{ secrets.DEPLOY_USER }}
+      #     key: ${{ secrets.DEPLOY_KEY }}
+      #     envs: GITHUB_USERNAME, GITHUB_TOKEN
+      #     script: |
+      #       docker login ghcr.io -u $GITHUB_USERNAME -p $GITHUB_TOKEN
+      #       docker pull ghcr.io/evgensoft/img_verify/img_verify:latest
+      #       docker stop img_verify
+      #       docker system prune -f
+      #       docker run --restart=always --name img_verify -v /home/ubuntu/img_verify:/app/log -dit -p 8080:8080 ghcr.io/evgensoft/img_verify/img_verify:latest
