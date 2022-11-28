@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"encoding/base64"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -39,17 +38,7 @@ func Handler(ctx context.Context, request []byte) (*Response, error) {
 	if req.URL == "" {
 		return nil, errors.New("URL is null")
 	}
-	/*
-		creds := ycsdk.InstanceServiceAccount()
 
-		token, err := creds.IAMToken(ctx)
-		if err != nil {
-			return nil, err
-		}
-
-		log.Infof("token received - %v", token.IamToken)
-		log.Infof("request received - %+#v", req)
-	*/
 	handlers.ImageInfo(req, true)
 
 	log.Info().Msgf("send - %+#v", req)
@@ -59,42 +48,4 @@ func Handler(ctx context.Context, request []byte) (*Response, error) {
 		StatusCode: 200,
 		Body:       req,
 	}, nil
-}
-
-func ImageYandexModeration(msg *handlers.Message) {
-	type ClassificationConfig struct {
-		Model string `json:"model"`
-	}
-
-	type Features struct {
-		Type                 string               `json:"type"`
-		ClassificationConfig ClassificationConfig `json:"classificationConfig"`
-	}
-
-	type AnalyzeSpecs struct {
-		Content  string     `json:"content"`
-		Features []Features `json:"features"`
-	}
-
-	type ImageYaModeration struct {
-		FolderID     string         `json:"folderId"`
-		AnalyzeSpecs []AnalyzeSpecs `json:"analyze_specs"`
-	}
-
-	payload, err := handlers.ApiRequest("GET", msg.URL, nil)
-	if err != nil {
-		msg.Error = err.Error()
-		msg.Note = handlers.NoteImageNotFound
-
-		return
-	}
-
-	imgB64 := base64.StdEncoding.EncodeToString(*payload)
-	a := AnalyzeSpecs{}
-	a.Content = imgB64
-
-	a.Features = append(a.Features, Features{Type: "Classification", ClassificationConfig: ClassificationConfig{Model: "quality"}})
-	yaMod := ImageYaModeration{}
-	yaMod.FolderID = "b1gdc4jel0cegsk6h65s"
-	yaMod.AnalyzeSpecs = append(yaMod.AnalyzeSpecs, a)
 }

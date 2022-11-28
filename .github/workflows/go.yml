@@ -64,8 +64,7 @@ jobs:
           entrypoint: "index.Handler"
           execution-timeout: 5
           environment: |
-            DEBUG=True
-            FOO=bar
+            YANDEX_CLOUD_SERVERLESS_FUNCTION=true
           # include: |
           #   ./src
           #   package.json

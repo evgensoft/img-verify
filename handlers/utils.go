@@ -3,16 +3,21 @@ package handlers
 import (
 	"bytes"
 	"context"
+	"encoding/base64"
+	"encoding/json"
 	"fmt"
 	"image"
 	"image/gif"
 	"io"
 	"net/http"
+	"os"
+	"strings"
 	"time"
 
 	"img-verify/logger"
 
 	"github.com/corona10/goimagehash"
+	ycsdk "github.com/yandex-cloud/go-sdk"
 )
 
 const (
@@ -97,10 +102,68 @@ func ImageInfo(msg *Message, onlyHash bool) {
 	}
 
 	if !onlyHash {
-		if !findFace(img1) {
-			msg.Note = NoteFaceNotFound
+		// Определяем работу в YANDEX_CLOUD
+		yaCloud, exists := os.LookupEnv("YANDEX_CLOUD_SERVERLESS_FUNCTION")
+		if !exists { // если не YANDEX_CLOUD - определяем лица локальной библиотекой
+			if !findFace(img1) {
+				msg.Note = NoteFaceNotFound
+			}
+		}
+
+		if yaCloud == "true" {
+			err := ImageYandexModeration(payload)
+			if err != nil {
+				msg.Error = err.Error()
+				msg.Note = NoteImageNotFound
+			}
 		}
 	}
+}
+
+func ImageYandexModeration(payload *[]byte) error {
+	type ClassificationConfig struct {
+		Model string `json:"model"`
+	}
+
+	type Features struct {
+		Type                 string               `json:"type"`
+		ClassificationConfig ClassificationConfig `json:"classificationConfig"`
+	}
+
+	type AnalyzeSpecs struct {
+		Content  string     `json:"content"`
+		Features []Features `json:"features"`
+	}
+
+	type ImageYaModeration struct {
+		FolderID     string         `json:"folderId"`
+		AnalyzeSpecs []AnalyzeSpecs `json:"analyze_specs"`
+	}
+
+	imgB64 := base64.StdEncoding.EncodeToString(*payload)
+	a := AnalyzeSpecs{}
+	a.Content = imgB64
+
+	a.Features = append(a.Features, Features{Type: "Classification", ClassificationConfig: ClassificationConfig{Model: "quality"}})
+	a.Features = append(a.Features, Features{Type: "Classification", ClassificationConfig: ClassificationConfig{Model: "moderation"}})
+	a.Features = append(a.Features, Features{Type: "FACE_DETECTION"})
+	yaMod := ImageYaModeration{}
+	yaMod.FolderID = "b1gdc4jel0cegsk6h65s"
+	yaMod.AnalyzeSpecs = append(yaMod.AnalyzeSpecs, a)
+
+	req, err := json.Marshal(yaMod)
+	if err != nil {
+		return err
+	}
+
+	body, err := ApiRequest("POST", "https://vision.api.cloud.yandex.net/vision/v1/batchAnalyze", req)
+	if err != nil {
+		return err
+	}
+
+	log.Debug().Msgf("Response from Cloud - %s", string(*body))
+
+	return nil
 }
 
 func checkImageFormat(img *[]byte) error {
@@ -134,6 +197,18 @@ func ApiRequest(method, url string, body []byte) (*[]byte, error) {
 	request, err := http.NewRequestWithContext(ctx, method, url, bytes.NewBuffer(body))
 	if err != nil {
 		return nil, fmt.Errorf("error create NewRequest - %w", err)
+	}
+
+	// Для запросов в YANDEX_CLOUD - добавляем IAMToken
+	if strings.Contains(url, "api.cloud.yandex.net") {
+		creds := ycsdk.InstanceServiceAccount()
+
+		token, err := creds.IAMToken(ctx)
+		if err != nil {
+			return nil, err
+		}
+
+		request.Header.Set("Authorization", "Bearer "+token.IamToken)
 	}
 
 	response, err := http.DefaultClient.Do(request)
