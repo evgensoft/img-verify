@@ -71,7 +71,8 @@ jobs:
             ./logger
             go.mod
             go.sum
-            *.go
+            main.go
+            index.go
           exclude: |
             ./git
             ./github
