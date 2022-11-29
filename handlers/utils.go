@@ -161,7 +161,7 @@ func ImageYandexModeration(payload *[]byte) error {
 		}
 	*/
 
-	reqStr := `{"folderId": "b1gdc4jel0cegsk6h65s", "analyze_specs": [{"content": "##content##","features": [{"type": "Classification","classificationConfig":{"model": "quality"}},{"type": "Classification", "classificationConfig": {"model": "moderation"}},{"type": "FACE_DETECTION"}]}]}`
+	reqStr := `{"folderId": "b1gdc4jel0cegsk6h65s", "analyze_specs": [{"content": "##content##","features": [{"type": "CLASSIFICATION","classificationConfig":{"model": "quality"}},{"type": "CLASSIFICATION", "classificationConfig": {"model": "moderation"}},{"type": "FACE_DETECTION"}]}]}`
 	req := []byte(strings.ReplaceAll(reqStr, "##content##", base64.StdEncoding.EncodeToString(*payload)))
 
 	body, err := ApiRequest("POST", "https://vision.api.cloud.yandex.net/vision/v1/batchAnalyze", req)
