@@ -114,7 +114,11 @@ func ImageInfo(msg *Message, onlyHash bool) {
 			err := ImageYandexModeration(payload)
 			if err != nil {
 				msg.Error = err.Error()
-				// msg.Note = NoteImageNotFound
+				if err.Error() == NoteFaceNotFound {
+					msg.Note = NoteFaceNotFound
+				} else {
+					msg.Note = NoteImageNotFound
+				}
 			}
 		}
 	}
