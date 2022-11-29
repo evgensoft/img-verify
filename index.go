@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"encoding/base64"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -10,8 +11,9 @@ import (
 )
 
 type RequestBody struct {
-	HttpMethod string `json:"httpMethod"`
-	Body       []byte `json:"body"`
+	HttpMethod      string `json:"httpMethod"`
+	Body            string `json:"body"`
+	IsBase64Encoded bool   `json:"isBase64Encoded"`
 }
 
 type Response struct {
@@ -29,8 +31,16 @@ func Handler(ctx context.Context, request []byte) (*Response, error) {
 	}
 
 	req := &handlers.Message{}
+	body := ""
+
+	if requestBody.IsBase64Encoded {
+		body = base64.StdEncoding.EncodeToString([]byte(requestBody.Body))
+	} else {
+		body = requestBody.Body
+	}
+
 	// Поле body запроса преобразуется в объект типа Request для получения переданного имени
-	err = json.Unmarshal(requestBody.Body, &req)
+	err = json.Unmarshal([]byte(body), &req)
 	if err != nil {
 		return nil, fmt.Errorf("an error has occurred when parsing body: %v", err)
 	}
