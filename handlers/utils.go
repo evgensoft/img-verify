@@ -40,6 +40,8 @@ func ImageInfo(msg *Message, onlyHash bool) {
 		return
 	}
 
+	log.Debug().Msgf("load image (%v Kb)", len(*payload)/1024)
+
 	err = checkImageFormat(payload)
 	if err != nil {
 		msg.Error = err.Error()
@@ -47,6 +49,8 @@ func ImageInfo(msg *Message, onlyHash bool) {
 
 		return
 	}
+
+	log.Debug().Msgf("checkImageFormat ok")
 
 	img1, _, err := image.Decode(bytes.NewReader(*payload))
 	if err != nil {
@@ -64,6 +68,9 @@ func ImageInfo(msg *Message, onlyHash bool) {
 	}
 
 	msg.Hash = hash1.ToString()
+
+	log.Debug().Msgf("msg.Hash = %v", msg.Hash)
+
 	// hash default image for "Picture not found" = "d:40e0c6a6f4008080"
 	if hash1.ToString() == "d:40e0c6a6f4008080" {
 		msg.Note = NoteImageNotFound
@@ -81,6 +88,7 @@ func ImageInfo(msg *Message, onlyHash bool) {
 		}
 
 		if yaCloud == "true" {
+			log.Debug().Msgf("load ImageYandexModeration")
 			err := ImageYandexModeration(payload)
 			if err != nil {
 				msg.Error = err.Error()
