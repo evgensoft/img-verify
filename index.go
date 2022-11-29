@@ -43,6 +43,8 @@ func Handler(ctx context.Context, request []byte) (*Response, error) {
 		body = []byte(requestBody.Body)
 	}
 
+	fmt.Printf("Body - %v\n", string(body))
+
 	// Поле body запроса преобразуется в объект типа Request для получения переданного имени
 	err = json.Unmarshal(body, &req)
 	if err != nil {
@@ -55,7 +57,7 @@ func Handler(ctx context.Context, request []byte) (*Response, error) {
 
 	handlers.ImageInfo(req, false)
 
-	// log.Info().Msgf("send - %+#v", req)
+	log.Info().Msgf("send - %+#v", req)
 	// Тело ответа необходимо вернуть в виде структуры, которая автоматически преобразуется в JSON-документ,
 	// который отобразится на экране
 	return &Response{

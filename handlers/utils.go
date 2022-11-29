@@ -32,36 +32,6 @@ const (
 var log = logger.GetLogger()
 
 func ImageInfo(msg *Message, onlyHash bool) {
-	/*
-		ctx, cancel := context.WithTimeout(context.Background(), GetImageTimeout)
-		defer cancel()
-
-		req, err := http.NewRequestWithContext(ctx, http.MethodGet, msg.URL, nil)
-		if err != nil {
-			msg.Error = err.Error()
-
-			return
-		}
-
-		resp, err := http.DefaultClient.Do(req)
-		if err != nil {
-			msg.Error = err.Error()
-
-			return
-		}
-		defer resp.Body.Close()
-
-		if resp.StatusCode != http.StatusOK {
-			msg.Error = "Ошибка загрузки файла - HTTP code " + resp.Status
-			msg.Note = NoteImageNotFound
-
-			return
-		}
-
-		resp.Body = http.MaxBytesReader(nil, resp.Body, MaxImageBytes)
-
-		payload, err := io.ReadAll(resp.Body)
-	*/
 	payload, err := ApiRequest("GET", msg.URL, nil)
 	if err != nil {
 		msg.Error = err.Error()
