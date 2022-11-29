@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/base64"
+	"encoding/json"
 	"fmt"
 	"image"
 	"image/gif"
@@ -124,6 +125,29 @@ func ImageYandexModeration(payload *[]byte) error {
 		// TODO: decrease image size for check in Cloud
 		return nil
 	}
+
+	type ResponseCloud struct {
+		Results []struct {
+			Results []struct {
+				Classification struct {
+					Properties []struct {
+						Name        string  `json:"name,omitempty"`
+						Probability float64 `json:"probability,omitempty"`
+					} `json:"properties,omitempty"`
+				} `json:"classification,omitempty"`
+				FaceDetection struct {
+					Faces []struct {
+						BoundingBox struct {
+							Vertices []struct {
+								X string `json:"x,omitempty"`
+								Y string `json:"y,omitempty"`
+							} `json:"vertices,omitempty"`
+						} `json:"boundingBox,omitempty"`
+					} `json:"faces,omitempty"`
+				} `json:"faceDetection,omitempty"`
+			} `json:"results,omitempty"`
+		} `json:"results,omitempty"`
+	}
 	/*
 		type ClassificationConfig struct {
 			Model string `json:"model"`
@@ -172,7 +196,25 @@ func ImageYandexModeration(payload *[]byte) error {
 		return err
 	}
 
+	var resp ResponseCloud
 	log.Debug().Msgf("Response from Cloud - %s", string(*body))
+
+	err = json.Unmarshal(*body, &resp)
+	if err != nil {
+		return err
+	}
+
+	// Check faces
+	if len(resp.Results[0].Results[0].FaceDetection.Faces) == 0 {
+		log.Debug().Msgf("NoteFaceNotFound")
+		// return fmt.Errorf("%v", NoteFaceNotFound)
+	}
+	// Check quality and moderation
+	for _, v := range resp.Results[0].Results {
+		for _, n := range v.Classification.Properties {
+			log.Debug().Msgf("Name - %s, probability = %v", n.Name, n.Probability)
+		}
+	}
 
 	return nil
 }
