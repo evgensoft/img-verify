@@ -205,14 +205,22 @@ func ImageYandexModeration(payload *[]byte) error {
 	}
 
 	// Check faces
-	if len(resp.Results[0].Results[0].FaceDetection.Faces) == 0 {
-		log.Debug().Msgf("NoteFaceNotFound")
-		// return fmt.Errorf("%v", NoteFaceNotFound)
-	}
+	// if len(resp.Results[0].Results[0].FaceDetection.Faces) == 0 {
+	// 	return fmt.Errorf("%v", NoteFaceNotFound)
+	// }
 	// Check quality and moderation
 	for _, v := range resp.Results[0].Results {
 		for _, n := range v.Classification.Properties {
-			log.Debug().Msgf("Name - %s, probability = %v", n.Name, n.Probability)
+			// log.Debug().Msgf("Name - %s, probability = %v", n.Name, n.Probability)
+			if n.Name == "low" && n.Probability > 0.7 {
+				return fmt.Errorf("Image low quality (%v)", n.Probability)
+			}
+			if n.Name == "text" && n.Probability > 0.7 {
+				return fmt.Errorf("Image has text (%v)", n.Probability)
+			}
+			if n.Name == "watermarks" && n.Probability > 0.7 {
+				return fmt.Errorf("Image has watermarks (%v)", n.Probability)
+			}
 		}
 	}
 
