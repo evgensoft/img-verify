@@ -32,16 +32,19 @@ func Handler(ctx context.Context, request []byte) (*Response, error) {
 	}
 
 	req := &handlers.Message{}
-	body := ""
+	body := []byte{}
 
 	if requestBody.IsBase64Encoded {
-		body = base64.StdEncoding.EncodeToString([]byte(requestBody.Body))
+		body, err = base64.StdEncoding.DecodeString(requestBody.Body)
+		if err != nil {
+			return nil, fmt.Errorf("an error has occurred when decode base64 request: %v", err)
+		}
 	} else {
-		body = requestBody.Body
+		body = []byte(requestBody.Body)
 	}
 
 	// Поле body запроса преобразуется в объект типа Request для получения переданного имени
-	err = json.Unmarshal([]byte(body), &req)
+	err = json.Unmarshal(body, &req)
 	if err != nil {
 		return nil, fmt.Errorf("an error has occurred when parsing body: %v", err)
 	}
