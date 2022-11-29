@@ -73,6 +73,7 @@ jobs:
             go.sum
             main.go
             index.go
+            facefinder
           exclude: |
             ./git
             ./github
