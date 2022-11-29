@@ -190,13 +190,12 @@ func ImageYandexModeration(payload *[]byte) error {
 
 	body, err := ApiRequest("POST", "https://vision.api.cloud.yandex.net/vision/v1/batchAnalyze", req)
 	if err != nil {
-		if body != nil {
-			log.Debug().Msgf("Response from Cloud - %s", string(*body))
-		}
 		return err
 	}
 
 	var resp ResponseCloud
+	var countImg int
+
 	log.Debug().Msgf("Response from Cloud - %s", string(*body))
 
 	err = json.Unmarshal(*body, &resp)
@@ -204,10 +203,6 @@ func ImageYandexModeration(payload *[]byte) error {
 		return err
 	}
 
-	// Check faces
-	// if len(resp.Results[0].Results[0].FaceDetection.Faces) == 0 {
-	// 	return fmt.Errorf("%v", NoteFaceNotFound)
-	// }
 	// Check quality and moderation
 	for _, v := range resp.Results[0].Results {
 		for _, n := range v.Classification.Properties {
@@ -222,6 +217,14 @@ func ImageYandexModeration(payload *[]byte) error {
 				return fmt.Errorf("Image has watermarks (%v)", n.Probability)
 			}
 		}
+		if len(v.FaceDetection.Faces) > 0 {
+			countImg = len(v.FaceDetection.Faces)
+		}
+	}
+
+	// Check faces
+	if countImg == 0 {
+		return fmt.Errorf("%v", NoteFaceNotFound)
 	}
 
 	return nil
