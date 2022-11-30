@@ -60,7 +60,7 @@ jobs:
           folder-id: "b1gdc4jel0cegsk6h65s"
           function-name: "img-verify"
           runtime: "golang119"
-          memory: "256Mb"
+          memory: "512Mb"
           entrypoint: "index.Handler"
           execution-timeout: 10
           service-account: "ajeih1bmna4po796e9n9"

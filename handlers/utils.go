@@ -11,7 +11,6 @@ import (
 	"io"
 	"net/http"
 	"os"
-	"runtime"
 	"strings"
 	"time"
 
@@ -51,7 +50,7 @@ func ImageInfo(msg *Message, onlyHash bool) {
 		return
 	}
 
-	runtime.GC()
+	// runtime.GC()
 
 	img1, _, err := image.Decode(bytes.NewReader(*payload))
 	if err != nil {
@@ -79,7 +78,7 @@ func ImageInfo(msg *Message, onlyHash bool) {
 		return
 	}
 
-	runtime.GC()
+	// runtime.GC()
 
 	if !onlyHash {
 		// Определяем работу в YANDEX_CLOUD
