@@ -50,8 +50,6 @@ func ImageInfo(msg *Message, onlyHash bool) {
 		return
 	}
 
-	log.Debug().Msgf("checkImageFormat ok")
-
 	img1, _, err := image.Decode(bytes.NewReader(*payload))
 	if err != nil {
 		msg.Error = err.Error()
@@ -88,7 +86,6 @@ func ImageInfo(msg *Message, onlyHash bool) {
 		}
 
 		if yaCloud == "true" {
-			log.Debug().Msgf("load ImageYandexModeration")
 			err := ImageYandexModeration(payload)
 			if err != nil {
 				msg.Error = err.Error()
@@ -218,6 +215,8 @@ func checkImageFormat(img *[]byte) error {
 		return err
 	}
 
+	log.Debug().Msgf("Format image: %v", format)
+
 	if format == "gif" {
 		g, err := gif.DecodeAll(bytes.NewReader(*img))
 		if err != nil {
@@ -265,6 +264,9 @@ func ApiRequest(method, url string, body []byte) (*[]byte, error) {
 	defer response.Body.Close()
 
 	if response.StatusCode != http.StatusOK {
+		if response.StatusCode == http.StatusNotFound {
+			return nil, fmt.Errorf("status code from apiRequest: %d", response.StatusCode)
+		}
 		resBody, _ := io.ReadAll(response.Body)
 		return nil, fmt.Errorf("unexpected status code from apiRequest: %d - %v", response.StatusCode, string(resBody))
 	}
