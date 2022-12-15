@@ -66,6 +66,7 @@ jobs:
           service-account: "ajeih1bmna4po796e9n9"
           environment: |
             YANDEX_CLOUD_SERVERLESS_FUNCTION=true
+            GOMEMLIMIT=450MiB
           include: |
             ./handlers
             ./logger
