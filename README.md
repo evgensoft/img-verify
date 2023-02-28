@@ -11,4 +11,4 @@
 - [x] Проверка по хеш на изображения-заглушки Img-хостингов (Not_found, Img_deleted...)
 - [x] Поиск лица человека на изображении
 - [ ] Подключение сторонних face-detection
-- [ ] Проверка на качество изображения (https://cloud.yandex.ru/docs/vision/concepts)
+- [x] Проверка на качество изображения (https://cloud.yandex.ru/docs/vision/concepts)
