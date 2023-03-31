@@ -84,7 +84,7 @@ jobs:
 
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       # - name: Build and Publish to Github Packages Registry
-      #   uses: elgohr/Publish-Docker-Github-Action@master
+      #   uses: elgohr/Publish-Docker-Github-Action@v5
       #   with:
       #     name: evgensoft/img_verify/img_verify
       #     registry: ghcr.io
