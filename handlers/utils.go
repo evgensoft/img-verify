@@ -222,18 +222,27 @@ func checkImageFormat(img *[]byte) error {
 	log.Debug().Msgf("Format image: %v", format)
 
 	if format == "gif" {
-		g, err := gif.DecodeAll(bytes.NewReader(*img))
+		err := checkGifImage(img)
 		if err != nil {
 			return err
-		}
-
-		if len(g.Image) > 0 {
-			return fmt.Errorf("Animated GIF")
 		}
 	}
 
 	if config.Width+config.Height > MaxPixels {
 		return fmt.Errorf("Image is too big in pixels - %v", config.Width+config.Height)
+	}
+
+	return nil
+}
+
+func checkGifImage(img *[]byte) error {
+	g, err := gif.DecodeAll(bytes.NewReader(*img))
+	if err != nil {
+		return err
+	}
+
+	if len(g.Image) > 0 {
+		return fmt.Errorf("Animated GIF")
 	}
 
 	return nil
