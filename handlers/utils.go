@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/base64"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"image"
 	"image/gif"
@@ -29,11 +30,18 @@ const (
 	MaxImageBytes     = 10 * 1024 * 1024
 )
 
-var log = logger.GetLogger()
+var (
+	log         = logger.GetLogger()
+	errImgur429 = errors.New("imgur StatusTooManyRequests")
+)
 
 func ImageInfo(msg *Message, onlyHash bool) {
 	payload, err := ApiRequest("GET", msg.URL, nil)
 	if err != nil {
+		if err == errImgur429 { // imgur StatusTooManyRequests in YandexCloud
+			return
+		}
+
 		msg.Error = err.Error()
 		msg.Note = NoteImageNotFound
 
@@ -279,6 +287,12 @@ func ApiRequest(method, url string, body []byte) (*[]byte, error) {
 	if response.StatusCode != http.StatusOK {
 		if response.StatusCode == http.StatusNotFound {
 			return nil, fmt.Errorf("status code from apiRequest: %d", response.StatusCode)
+		}
+		// Для запросов в imgur.com выдает code 429 - rate limits
+		// TODO - добавить загрузку через прокси
+		if strings.Contains(url, "imgur.com") && response.StatusCode == http.StatusTooManyRequests {
+			log.Debug().Msgf("Err load image from imgur.com - %v", response.Header)
+			return nil, errImgur429
 		}
 		resBody, _ := io.ReadAll(response.Body)
 		return nil, fmt.Errorf("unexpected status code from apiRequest: %d - %v", response.StatusCode, string(resBody))
