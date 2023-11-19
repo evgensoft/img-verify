@@ -35,6 +35,29 @@ var (
 	errImgur429 = errors.New("imgur StatusTooManyRequests")
 )
 
+type ResponseCloud struct {
+	Results []struct {
+		Results []struct {
+			Classification struct {
+				Properties []struct {
+					Name        string  `json:"name,omitempty"`
+					Probability float64 `json:"probability,omitempty"`
+				} `json:"properties,omitempty"`
+			} `json:"classification,omitempty"`
+			FaceDetection struct {
+				Faces []struct {
+					BoundingBox struct {
+						Vertices []struct {
+							X string `json:"x,omitempty"`
+							Y string `json:"y,omitempty"`
+						} `json:"vertices,omitempty"`
+					} `json:"boundingBox,omitempty"`
+				} `json:"faces,omitempty"`
+			} `json:"faceDetection,omitempty"`
+		} `json:"results,omitempty"`
+	} `json:"results,omitempty"`
+}
+
 func ImageInfo(msg *Message, onlyHash bool) {
 	payload, err := ApiRequest("GET", msg.URL, nil)
 	if err != nil {
@@ -119,65 +142,6 @@ func ImageYandexModeration(payload *[]byte) error {
 		return nil
 	}
 
-	type ResponseCloud struct {
-		Results []struct {
-			Results []struct {
-				Classification struct {
-					Properties []struct {
-						Name        string  `json:"name,omitempty"`
-						Probability float64 `json:"probability,omitempty"`
-					} `json:"properties,omitempty"`
-				} `json:"classification,omitempty"`
-				FaceDetection struct {
-					Faces []struct {
-						BoundingBox struct {
-							Vertices []struct {
-								X string `json:"x,omitempty"`
-								Y string `json:"y,omitempty"`
-							} `json:"vertices,omitempty"`
-						} `json:"boundingBox,omitempty"`
-					} `json:"faces,omitempty"`
-				} `json:"faceDetection,omitempty"`
-			} `json:"results,omitempty"`
-		} `json:"results,omitempty"`
-	}
-	/*
-		type ClassificationConfig struct {
-			Model string `json:"model"`
-		}
-
-		type Features struct {
-			Type                 string               `json:"type"`
-			ClassificationConfig ClassificationConfig `json:"classificationConfig,omitempty"`
-		}
-
-		type AnalyzeSpecs struct {
-			Content  string     `json:"content"`
-			Features []Features `json:"features"`
-		}
-
-		type ImageYaModeration struct {
-			FolderID     string         `json:"folderId"`
-			AnalyzeSpecs []AnalyzeSpecs `json:"analyze_specs"`
-		}
-
-		imgB64 := base64.StdEncoding.EncodeToString(*payload)
-		a := AnalyzeSpecs{}
-		a.Content = imgB64
-
-		a.Features = append(a.Features, Features{Type: "Classification", ClassificationConfig: ClassificationConfig{Model: "quality"}})
-		a.Features = append(a.Features, Features{Type: "Classification", ClassificationConfig: ClassificationConfig{Model: "moderation"}})
-		a.Features = append(a.Features, Features{Type: "FACE_DETECTION"})
-		yaMod := ImageYaModeration{}
-		yaMod.FolderID = "b1gdc4jel0cegsk6h65s"
-		yaMod.AnalyzeSpecs = append(yaMod.AnalyzeSpecs, a)
-
-		req, err := json.Marshal(yaMod)
-		if err != nil {
-			return err
-		}
-	*/
-
 	reqStr := `{"folderId": "b1gdc4jel0cegsk6h65s", "analyze_specs": [{"content": "##content##","features": [{"type": "CLASSIFICATION","classificationConfig":{"model": "quality"}},{"type": "CLASSIFICATION", "classificationConfig": {"model": "moderation"}},{"type": "FACE_DETECTION"}]}]}`
 	req := []byte(strings.ReplaceAll(reqStr, "##content##", base64.StdEncoding.EncodeToString(*payload)))
 
@@ -200,7 +164,6 @@ func ImageYandexModeration(payload *[]byte) error {
 	// Check quality and moderation
 	for _, v := range resp.Results[0].Results {
 		for _, n := range v.Classification.Properties {
-			// log.Debug().Msgf("Name - %s, probability = %v", n.Name, n.Probability)
 			if n.Name == "low" && n.Probability > 0.7 {
 				return fmt.Errorf("Image low quality (%v)", n.Probability)
 			}
