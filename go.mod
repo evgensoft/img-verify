@@ -1,6 +1,6 @@
 module img-verify
 
-go 1.20
+go 1.21
 
 require (
 	github.com/corona10/goimagehash v1.1.0
@@ -17,7 +17,7 @@ require (
 	github.com/hashicorp/go-multierror v1.0.0 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.19 // indirect
-	github.com/yandex-cloud/go-genproto v0.0.0-20221121121243-292994614e1b // indirect
+	github.com/yandex-cloud/go-genproto v0.0.0-20231113081202-b7172db2c520 // indirect
 	golang.org/x/net v0.17.0 // indirect
 	golang.org/x/text v0.13.0 // indirect
 	google.golang.org/genproto v0.0.0-20230410155749-daa745c078e1 // indirect

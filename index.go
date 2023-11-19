@@ -23,7 +23,8 @@ type Response struct {
 
 // Handler - функция, для запуска в Yandex Cloud Functions
 func Handler(ctx context.Context, request []byte) (*Response, error) {
-	fmt.Printf("requestBody - %v\n", string(request))
+	log.Info().Msgf("requestBody - %v\n", string(request))
+
 	requestBody := &RequestBody{}
 	// Массив байтов, содержащий тело запроса, преобразуется в соответствующий объект
 	err := json.Unmarshal(request, &requestBody)
@@ -43,7 +44,7 @@ func Handler(ctx context.Context, request []byte) (*Response, error) {
 		body = []byte(requestBody.Body)
 	}
 
-	fmt.Printf("Body - %v\n", string(body))
+	log.Info().Msgf("Body - %v\n", string(body))
 
 	// Поле body запроса преобразуется в объект типа Request для получения переданного имени
 	err = json.Unmarshal(body, &req)

@@ -6,3 +6,4 @@ linters:
     - gci
     - godot
     - exhaustivestruct
+    - depguard

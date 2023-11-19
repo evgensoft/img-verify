@@ -27,7 +27,7 @@ const (
 	NoteFaceNotFound  = "NO_FACE"
 	GetImageTimeout   = 60 * time.Second
 	apiRequestTimeout = 10 * time.Second
-	MaxImageBytes     = 10 * 1024 * 1024
+	MaxImageBytes     = 20 * 1024 * 1024
 )
 
 var (
@@ -58,8 +58,6 @@ func ImageInfo(msg *Message, onlyHash bool) {
 		return
 	}
 
-	// runtime.GC()
-
 	img1, _, err := image.Decode(bytes.NewReader(*payload))
 	if err != nil {
 		msg.Error = err.Error()
@@ -68,6 +66,34 @@ func ImageInfo(msg *Message, onlyHash bool) {
 		return
 	}
 
+	calculateHash(msg, img1)
+
+	if onlyHash {
+		return
+	}
+
+	// Определяем работу в YANDEX_CLOUD
+	yaCloud, exists := os.LookupEnv("YANDEX_CLOUD_SERVERLESS_FUNCTION")
+	if !exists { // если не YANDEX_CLOUD - определяем лица локальной библиотекой
+		if !findFace(img1) {
+			msg.Note = NoteFaceNotFound
+		}
+	}
+
+	if yaCloud == "true" {
+		err := ImageYandexModeration(payload)
+		if err != nil {
+			msg.Error = err.Error()
+			if err.Error() == NoteFaceNotFound {
+				msg.Note = NoteFaceNotFound
+			} else {
+				msg.Note = NoteImageNotFound
+			}
+		}
+	}
+}
+
+func calculateHash(msg *Message, img1 image.Image) {
 	hash1, err := goimagehash.DifferenceHash(img1)
 	if err != nil {
 		msg.Error = err.Error()
@@ -84,30 +110,6 @@ func ImageInfo(msg *Message, onlyHash bool) {
 		msg.Note = NoteImageNotFound
 
 		return
-	}
-
-	// runtime.GC()
-
-	if !onlyHash {
-		// Определяем работу в YANDEX_CLOUD
-		yaCloud, exists := os.LookupEnv("YANDEX_CLOUD_SERVERLESS_FUNCTION")
-		if !exists { // если не YANDEX_CLOUD - определяем лица локальной библиотекой
-			if !findFace(img1) {
-				msg.Note = NoteFaceNotFound
-			}
-		}
-
-		if yaCloud == "true" {
-			err := ImageYandexModeration(payload)
-			if err != nil {
-				msg.Error = err.Error()
-				if err.Error() == NoteFaceNotFound {
-					msg.Note = NoteFaceNotFound
-				} else {
-					msg.Note = NoteImageNotFound
-				}
-			}
-		}
 	}
 }
 
@@ -185,6 +187,7 @@ func ImageYandexModeration(payload *[]byte) error {
 	}
 
 	var resp ResponseCloud
+
 	var countImg int
 
 	log.Debug().Msgf("Response from Cloud - %s", string(*body))
@@ -201,13 +204,16 @@ func ImageYandexModeration(payload *[]byte) error {
 			if n.Name == "low" && n.Probability > 0.7 {
 				return fmt.Errorf("Image low quality (%v)", n.Probability)
 			}
+
 			if n.Name == "text" && n.Probability > 0.7 {
 				return fmt.Errorf("Image has text (%v)", n.Probability)
 			}
+
 			if n.Name == "watermarks" && n.Probability > 0.7 {
 				return fmt.Errorf("Image has watermarks (%v)", n.Probability)
 			}
 		}
+
 		if len(v.FaceDetection.Faces) > 0 {
 			countImg = len(v.FaceDetection.Faces)
 		}
@@ -292,9 +298,12 @@ func ApiRequest(method, url string, body []byte) (*[]byte, error) {
 		// TODO - добавить загрузку через прокси
 		if strings.Contains(url, "imgur.com") && response.StatusCode == http.StatusTooManyRequests {
 			log.Debug().Msgf("Err load image from imgur.com - %v", response.Header)
+
 			return nil, errImgur429
 		}
+
 		resBody, _ := io.ReadAll(response.Body)
+
 		return nil, fmt.Errorf("unexpected status code from apiRequest: %d - %v", response.StatusCode, string(resBody))
 	}
 
