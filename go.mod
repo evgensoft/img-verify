@@ -18,11 +18,11 @@ require (
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.19 // indirect
 	github.com/nfnt/resize v0.0.0-20180221191011-83c6a9932646 // indirect
-	github.com/yandex-cloud/go-genproto v0.0.0-20231113081202-b7172db2c520 // indirect
-	github.com/yandex-cloud/go-sdk v0.0.0-20221121122038-e3352384a86d
-	golang.org/x/net v0.17.0 // indirect
-	golang.org/x/sys v0.13.0 // indirect
-	golang.org/x/text v0.13.0 // indirect
+	github.com/yandex-cloud/go-genproto v0.0.0-20240415105904-a04abcf10f46 // indirect
+	github.com/yandex-cloud/go-sdk v0.0.0-20240318084659-dfa50323a0b4
+	golang.org/x/net v0.24.0 // indirect
+	golang.org/x/sys v0.19.0 // indirect
+	golang.org/x/text v0.14.0 // indirect
 	google.golang.org/genproto v0.0.0-20230410155749-daa745c078e1 // indirect
 	google.golang.org/grpc v1.56.3 // indirect
 	google.golang.org/protobuf v1.33.0 // indirect
